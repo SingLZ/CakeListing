@@ -1,14 +1,24 @@
-const cake = require('../models/cake');
+const Cake = require('../models/cake');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors');
 
 const getAllCakes = async (req, res) => {
-   res.status(500).json({ message: 'Server error', error });
+  const cakes = await Cake.find({ createdBy: req.user.userId }).sort('createdAt');
+  res.status(StatusCodes.OK).json({ cakes, count: cakes.length });
 
 }
 
 const getCake = async (req, res) => {
-  res.status(200).json({ message: 'Get a single cake' });
+  const {user:{userId}, params:{id: cakeId}} = req;
+
+  const cake = await Cake.findOne({
+    _id:cakeId, createdBy:userId
+  });
+
+  if (!cake) {
+    throw new NotFoundError(`No cake with id ${cakeId}`);
+  }
+  res.status(StatusCodes.OK).json({ cake });
 }
 
 const createCake = async (req, res) => {
@@ -19,14 +29,40 @@ const createCake = async (req, res) => {
 }
 
 const updateCake = async (req, res) => {
-  res.status(200).json({ message: 'User logged in successfully' });
+  const {body:{name, description}, user:{userId}, params:{id: cakeId}} = req;
+
+  if (name=== '' || description === '') {
+    throw new BadRequestError('Name or Description cannot be empty');
+  }
+  
+  const cake = await Cake.findByIdAndUpdate(
+    { _id: cakeId, createdBy: userId },
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!cake) {
+    throw new NotFoundError(`No cake with id ${cakeId}`);
+  }
+  res.status(StatusCodes.OK).json({ cake });
  
 }
 
 const deleteCake = async (req, res) => {
-
-  res.status(200).json({ message: 'User logged in successfully' });
+  const {user:{userId}, params:{id: cakeId}} = req;
   
+  const cake = await Cake.findByIdAndRemove({
+    _id:cakeId, createdBy:userId
+  });
+
+  if (!cake) {
+    throw new NotFoundError(`No cake with id ${cakeId}`);
+  }
+
+   res.status(StatusCodes.OK).send();
 }
 
 module.exports = {
