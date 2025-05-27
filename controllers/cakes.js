@@ -23,10 +23,10 @@ const getCake = async (req, res) => {
 
 const createCake = async (req, res) => {
   req.body.createdBy = req.user.userId;
-  const cake = await cake.create(req.body);
-  res.status(201).json({ message: 'User registered successfully' });
-  
+  const cake = await Cake.create(req.body); 
+  res.status(StatusCodes.CREATED).json({ cake }); 
 }
+
 
 const updateCake = async (req, res) => {
   const {body:{name, description}, user:{userId}, params:{id: cakeId}} = req;
