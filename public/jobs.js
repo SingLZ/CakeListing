@@ -7,7 +7,7 @@ import {
   enableInput,
 } from "./index.js";
 import { showLoginRegister } from "./loginRegister.js";
-import { showAddEdit } from "./addEdit.js";
+import { showAddEdit, handledDelete } from "./addEdit.js";
 
 let jobsDiv = null;
 let jobsTable = null;
@@ -35,7 +35,10 @@ export const handleJobs = () => {
       } else if (e.target.classList.contains("editButton")) {
         message.textContent = "";
         showAddEdit(e.target.dataset.id);
+      } else if (e.target.classList.contains("deleteButton")) {
+        handledDelete(e.target.dataset.id);
       }
+        
     }
   });
 };
@@ -44,7 +47,7 @@ export const showJobs = async () => {
   try {
     enableInput(false);
 
-    const response = await fetch("/api/v1/jobs", {
+    const response = await fetch("/api/v1/cakes", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -59,16 +62,16 @@ export const showJobs = async () => {
       if (data.count === 0) {
         jobsTable.replaceChildren(...children); // clear this for safety
       } else {
-        for (let i = 0; i < data.jobs.length; i++) {
+        for (let i = 0; i < data.cakes.length; i++) {
           let rowEntry = document.createElement("tr");
 
-          let editButton = `<td><button type="button" class="editButton" data-id=${data.jobs[i]._id}>edit</button></td>`;
-          let deleteButton = `<td><button type="button" class="deleteButton" data-id=${data.jobs[i]._id}>delete</button></td>`;
+          let editButton = `<button type="button" class="editButton" data-id=${data.cakes[i]._id}>edit</button>`;
+          let deleteButton = `<button type="button" class="deleteButton" data-id=${data.cakes[i]._id}>delete</button>`;
           let rowHTML = `
-            <td>${data.jobs[i].company}</td>
-            <td>${data.jobs[i].position}</td>
-            <td>${data.jobs[i].status}</td>
-            <div>${editButton}${deleteButton}</div>`;
+            <td>${data.cakes[i].name}</td>
+            <td>${data.cakes[i].description}</td>
+            <td>${data.cakes[i].image}</td>
+            <td>${editButton}${deleteButton}</td>`;
 
           rowEntry.innerHTML = rowHTML;
           children.push(rowEntry);

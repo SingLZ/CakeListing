@@ -2,80 +2,78 @@ import { enableInput, inputEnabled, message, setDiv, token } from "./index.js";
 import { showJobs } from "./jobs.js";
 
 let addEditDiv = null;
-let company = null;
-let position = null;
-let status = null;
-let addingJob = null;
+let name = null;
+let description = null;
+let image = null;
+let addingCake = null;
 
 export const handleAddEdit = () => {
   addEditDiv = document.getElementById("edit-job");
-  company = document.getElementById("company");
-  position = document.getElementById("position");
-  status = document.getElementById("status");
-  addingJob = document.getElementById("adding-job");
+  name = document.getElementById("cake");
+  description = document.getElementById("description");
+  image = document.getElementById("image");
+  addingCake = document.getElementById("adding-job");
   const editCancel = document.getElementById("edit-cancel");
 
   addEditDiv.addEventListener("click", async (e) => {
-  if (inputEnabled && e.target.nodeName === "BUTTON") {
-if (e.target === addingJob) {
-  enableInput(false);
+    if (inputEnabled && e.target.nodeName === "BUTTON") {
+      if (e.target === addingCake) {
+        enableInput(false);
 
-  let method = "POST";
-  let url = "/api/v1/jobs";
+        let method = "POST";
+        let url = "/api/v1/cakes";
 
-  if (addingJob.textContent === "update") {
-    method = "PATCH";
-    url = `/api/v1/jobs/${addEditDiv.dataset.id}`;
-  }
+        if (addingCake.textContent === "update") {
+          method = "PATCH";
+          url = `/api/v1/cakes/${addEditDiv.dataset.id}`;
+        }
 
-  try {
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        company: company.value,
-        position: position.value,
-        status: status.value,
-      }),
-    });
+        try {
+          const response = await fetch(url, {
+            method: method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              name: name.value,
+              description: description.value,
+              image: image.value,
+            }),
+          });
 
-    const data = await response.json();
-    if (response.status === 200 || response.status === 201) {
-      if (response.status === 200) {
-        // a 200 is expected for a successful update
-        message.textContent = "The job entry was updated.";
-      } else {
-        // a 201 is expected for a successful create
-        message.textContent = "The job entry was created.";
+          const data = await response.json();
+          if (response.status === 200 || response.status === 201) {
+            if (response.status === 200) {
+              message.textContent = "The cake entry was updated.";
+            } else {
+              message.textContent = "The cake entry was created.";
+            }
+
+            name.value = "";
+            description.value = "";
+            image.value = "";
+            showJobs();
+          } else {
+            message.textContent = data.msg;
+          }
+        } catch (err) {
+          console.log(err);
+          message.textContent = "A communication error occurred.";
+        }
+        enableInput(true);
       }
-
-      company.value = "";
-      position.value = "";
-      status.value = "pending";
-      showJobs();
-    } else {
-      message.textContent = data.msg;
     }
-  } catch (err) {
-    console.log(err);
-    message.textContent = "A communication error occurred.";
-  }
-  enableInput(true);
-}
-
-  }
-});
+  });
 };
 
-export const showAddEdit = async (jobId) => {
-  if (!jobId) {
-    company.value = "";
-    position.value = "";
-    status.value = "pending";
-    addingJob.textContent = "add";
+export const showAddEdit = async (cakeId) => {
+
+  if (!cakeId) {
+    name.value = "";
+    description.value = "";
+    image.value = "";
+    addingCake.textContent = "add";
     message.textContent = "";
 
     setDiv(addEditDiv);
@@ -83,7 +81,7 @@ export const showAddEdit = async (jobId) => {
     enableInput(false);
 
     try {
-      const response = await fetch(`/api/v1/jobs/${jobId}`, {
+      const response = await fetch(`/api/v1/cakes/${cakeId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -92,26 +90,51 @@ export const showAddEdit = async (jobId) => {
       });
 
       const data = await response.json();
-      if (response.status === 200) {
-        company.value = data.job.company;
-        position.value = data.job.position;
-        status.value = data.job.status;
-        addingJob.textContent = "update";
+      if (response.status === 200 && data.cake) {
+        name.value = data.cake.name;
+        description.value = data.cake.description;
+        image.value = data.cake.image;
+        addingCake.textContent = "update";
         message.textContent = "";
-        addEditDiv.dataset.id = jobId;
+        addEditDiv.dataset.id = cakeId;
 
         setDiv(addEditDiv);
       } else {
-        // might happen if the list has been updated since last display
-        message.textContent = "The jobs entry was not found";
+        message.textContent = "The cake entry was not found";
         showJobs();
       }
     } catch (err) {
       console.log(err);
-      message.textContent = "A communications error has occurred.";
+      message.textContent = "A communication error has occurred.";
       showJobs();
     }
 
     enableInput(true);
   }
 };
+
+export const handledDelete = async (cakeId) => {
+      // DELETE handler
+      if (confirm("Are you sure you want to delete this cake?")) {
+        enableInput(false);
+        try {
+          const response = await fetch(`/api/v1/cakes/${cakeId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (response.status === 200) {
+            message.textContent = "The cake entry was deleted.";
+            showJobs();
+          } else {
+            message.textContent = data.msg;
+          }
+        } catch (err) {
+          console.log(err);
+          message.textContent = "A communication error occurred.";
+        }
+        enableInput(true);
+      }}
+
