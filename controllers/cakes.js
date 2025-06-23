@@ -62,7 +62,7 @@ const deleteCake = async (req, res) => {
     throw new NotFoundError(`No cake with id ${cakeId}`);
   }
 
-   res.status(StatusCodes.OK).send();
+   res.status(StatusCodes.OK).json({ msg: "The entry was deleted." });
 }
 
 module.exports = {
