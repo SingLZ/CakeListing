@@ -13,7 +13,16 @@ const cakeSchema = new Schema({
   },
   image: {
     type: String,
-    required: [true, 'Please provide an image URL'],
+    required: [true, 'Please provide an image URL or put N/A'],
+  },
+  price: {
+    type: Number,
+    required: [true, 'Please provide a price'],
+    min: 0,
+  },
+  isAvailable: {
+    type: Boolean,
+    default: true,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

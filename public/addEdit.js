@@ -6,6 +6,10 @@ let name = null;
 let description = null;
 let image = null;
 let addingCake = null;
+let price = null;
+let isAvailable = null;
+
+
 
 export const handleAddEdit = () => {
   addEditDiv = document.getElementById("edit-job");
@@ -14,6 +18,13 @@ export const handleAddEdit = () => {
   image = document.getElementById("image");
   addingCake = document.getElementById("adding-job");
   const editCancel = document.getElementById("edit-cancel");
+  price = document.getElementById("price");
+  isAvailable = document.getElementById("isAvailable");
+
+
+  editCancel.addEventListener("click", () => {
+    setDiv(document.getElementById("jobs"));
+  });
 
   addEditDiv.addEventListener("click", async (e) => {
     if (inputEnabled && e.target.nodeName === "BUTTON") {
@@ -39,6 +50,8 @@ export const handleAddEdit = () => {
               name: name.value,
               description: description.value,
               image: image.value,
+              price: parseFloat(price.value),
+              isAvailable: isAvailable.checked
             }),
           });
 
@@ -53,6 +66,8 @@ export const handleAddEdit = () => {
             name.value = "";
             description.value = "";
             image.value = "";
+            price.value = data.cake.price ?? '';
+            isAvailable.checked = !!data.cake.isAvailable;
             showJobs();
           } else {
             message.textContent = data.msg;
@@ -75,6 +90,8 @@ export const showAddEdit = async (cakeId) => {
     image.value = "";
     addingCake.textContent = "add";
     message.textContent = "";
+    price.value = '';
+    isAvailable.checked = true;
 
     setDiv(addEditDiv);
   } else {
