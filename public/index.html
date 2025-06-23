@@ -1,97 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cakes List</title>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cakes List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px auto;
+      max-width: 800px;
+      padding: 20px;
+      background-color: #fefefe;
+      color: #333;
+    }
 
-  <body>
-    <h1>Cakes List</h1>
-    <hr />
-    <p id="message"></p>
-    <hr />
-    <div id="logon-register" style="display:none;">
-      <button type="button" id="logon">logon</button>
-      <button type="button" id="register">register</button>
-    </div>
-    <div id="logon-div" style="display:none;">
-      <form>
-        <div>
-          <label for="email">email:</label>
-          <input type="email" id="email" />
-        </div>
-        <div>
-          <label for="password">password:</label>
-          <input type="password" id="password" />
-        </div>
-        <button type="button" id="logon-button">logon</button>
-        <button type="button" id="logon-cancel">cancel</button>
-      </form>
-    </div>
-    <div id="register-div" style="display:none;">
-      <form>
-        <div>
-          <label for="name">name:</label>
-          <input type="text" id="name" />
-        </div>
-        <div>
-          <label for="email1">email:</label>
-          <input type="email" id="email1" />
-        </div>
-        <div>
-          <label for="password1">password:</label>
-          <input type="password" id="password1" />
-        </div>
-        <div>
-          <label for="password2">verify password:</label>
-          <input type="password" id="password2" />
-        </div>
-        <button type="button" id="register-button">register</button>
-        <button type="button" id="register-cancel">cancel</button>
-      </form>
-    </div>
-    <div id="jobs" style="display:none;">
-      <p id="jobs-message"></p>
-      <table id="jobs-table">
-        <tr id="jobs-table-header">
-          <th>Cake</th>
-          <th>Description</th>
-          <th>Image</th>
-          <th colspan="2"></th>
-        </tr>
-      </table>
-      <button type="button" id="add-job">add cake</button>
-      <button type="button" id="logoff">log off</button>
-    </div>
-    <div id="edit-job" style="display:none;">
-      <form>
-        <div>
-          <label for="company">Cake:</label>
-          <input type="text" id="cake" />
-        </div>
-        <div>
-          <label for="position">Description:</label>
-          <input type="text" id="description" />
-        </div>
-         <div>
-          <label for="image">Image:</label>
-          <input type="text" id="image" />
-        </div>
-        <!-- <div>
-          <label for="status">Image:</label>
-          <select id="status">
-            <option value="pending">None</option>
-            <option value="interview">Url</option>
-            <option value="declined">Upload</option>
-          </select>
-        </div> -->
-        <button type="button" id="adding-job">add</button>
-        <button type="button" id="edit-cancel">cancel</button>
-      </form>
-    </div>
+    h1 {
+      text-align: center;
+      color: #c0392b;
+    }
 
-    <script src="./index.js" type="module"></script>
-  </body>
+    hr {
+      margin: 20px 0;
+    }
+
+    form > div {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"] {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    input[type="checkbox"] {
+      margin-left: 5px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #c0392b;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #a93226;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    img {
+      max-width: 100px;
+      border-radius: 4px;
+    }
+
+    #message, #jobs-message {
+      font-style: italic;
+      color: #555;
+    }
+
+    #edit-job, #logon-div, #register-div {
+      background-color: #fafafa;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+
+    #sort-asc, #sort-desc {
+      background-color: #3498db;
+    }
+
+    #sort-asc:hover, #sort-desc:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cakes List</h1>
+  <hr />
+  <p id="message"></p>
+  <hr />
+
+  <div id="logon-register" style="display:none;">
+    <button type="button" id="logon">Logon</button>
+    <button type="button" id="register">Register</button>
+  </div>
+
+  <div id="logon-div" style="display:none;">
+    <form>
+      <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" />
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" />
+      </div>
+      <button type="button" id="logon-button">Logon</button>
+      <button type="button" id="logon-cancel">Cancel</button>
+    </form>
+  </div>
+
+  <div id="register-div" style="display:none;">
+    <form>
+      <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" />
+      </div>
+      <div>
+        <label for="email1">Email:</label>
+        <input type="email" id="email1" />
+      </div>
+      <div>
+        <label for="password1">Password:</label>
+        <input type="password" id="password1" />
+      </div>
+      <div>
+        <label for="password2">Verify Password:</label>
+        <input type="password" id="password2" />
+      </div>
+      <button type="button" id="register-button">Register</button>
+      <button type="button" id="register-cancel">Cancel</button>
+    </form>
+  </div>
+
+  <div id="jobs" style="display:none;">
+    <p id="jobs-message"></p>
+    <button type="button" id="sort-asc">Sort A → Z</button>
+    <button type="button" id="sort-desc">Sort Z → A</button>
+
+    <table id="jobs-table">
+      <tr id="jobs-table-header">
+        <th>Name</th>
+        <th>Description</th>
+        <th>Image</th>
+        <th>Price</th>
+        <th>Available?</th>
+        <th>Actions</th>
+      </tr>
+    </table>
+
+    <button type="button" id="add-job">Add Cake</button>
+    <button type="button" id="logoff">Log Off</button>
+  </div>
+
+  <div id="edit-job" style="display:none;">
+    <form>
+      <div>
+        <label for="cake">Cake Name:</label>
+        <input type="text" id="cake" />
+      </div>
+      <div>
+        <label for="description">Description:</label>
+        <input type="text" id="description" />
+      </div>
+      <div>
+        <label for="image">Image URL:</label>
+        <input type="text" id="image" />
+      </div>
+      <div>
+        <label for="price">Price:</label>
+        <input type="number" id="price" placeholder="Price" step="0.01" min="0" />
+      </div>
+      <div>
+        <input type="checkbox" id="isAvailable" /> Available
+      </div>
+      <button type="button" id="adding-job">Add</button>
+      <button type="button" id="edit-cancel">Cancel</button>
+    </form>
+  </div>
+
+  <script src="./index.js" type="module"></script>
+</body>
 </html>

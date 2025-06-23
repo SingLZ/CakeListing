@@ -19,6 +19,12 @@ export const handleJobs = () => {
   const addJob = document.getElementById("add-job");
   jobsTable = document.getElementById("jobs-table");
   jobsTableHeader = document.getElementById("jobs-table-header");
+  const sortAsc = document.getElementById("sort-asc");
+  const sortDesc = document.getElementById("sort-desc");
+
+  sortAsc.addEventListener("click", () => showJobs("name"));
+  sortDesc.addEventListener("click", () => showJobs("-name"));
+
 
   jobsDiv.addEventListener("click", (e) => {
     if (inputEnabled && e.target.nodeName === "BUTTON") {
@@ -43,11 +49,14 @@ export const handleJobs = () => {
   });
 };
 
-export const showJobs = async () => {
+export const showJobs = async (sort = "") => {
   try {
     enableInput(false);
 
-    const response = await fetch("/api/v1/cakes", {
+    const url = new URL("/api/v1/cakes", window.location.origin);
+    if (sort) url.searchParams.append("sort", sort);
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -60,21 +69,22 @@ export const showJobs = async () => {
 
     if (response.status === 200) {
       if (data.count === 0) {
-        jobsTable.replaceChildren(...children); // clear this for safety
+        jobsTable.replaceChildren(...children);
       } else {
-        for (let i = 0; i < data.cakes.length; i++) {
-          let rowEntry = document.createElement("tr");
-
-          let editButton = `<button type="button" class="editButton" data-id=${data.cakes[i]._id}>edit</button>`;
-          let deleteButton = `<button type="button" class="deleteButton" data-id=${data.cakes[i]._id}>delete</button>`;
-          let rowHTML = `
-            <td>${data.cakes[i].name}</td>
-            <td>${data.cakes[i].description}</td>
-            <td>${data.cakes[i].image}</td>
-            <td>${editButton}${deleteButton}</td>`;
-
-          rowEntry.innerHTML = rowHTML;
-          children.push(rowEntry);
+        for (let cake of data.cakes) {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${cake.name}</td>
+            <td>${cake.description}</td>
+            <td><img src="${cake.image}" alt="${cake.name}" width="100"></td>
+            <td>$${cake.price?.toFixed(2) || ''}</td>
+            <td>${cake.isAvailable ? '✅' : '❌'}</td>
+            <td>
+              <button type="button" class="editButton" data-id="${cake._id}">edit</button>
+              <button type="button" class="deleteButton" data-id="${cake._id}">delete</button>
+            </td>
+          `;
+          children.push(row);
         }
         jobsTable.replaceChildren(...children);
       }
@@ -82,7 +92,7 @@ export const showJobs = async () => {
       message.textContent = data.msg;
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
     message.textContent = "A communication error occurred.";
   }
   enableInput(true);
