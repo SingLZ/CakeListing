@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 require("../app");
 const { seed_db, testUserPassword } = require("../util/seed_db");
-const Job = require("../models/Job");
+const cake = require("../models/cake");
 
 let testUser = null;
 

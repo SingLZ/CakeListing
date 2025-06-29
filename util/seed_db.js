@@ -4,14 +4,14 @@ const faker = require("@faker-js/faker").fakerEN_US;
 const FactoryGirl = require('factory-girl');
 require("dotenv").config();
 
-const testUserPassword = faker.internet.password();
+const testUserPassword = "StrongPassword123!";
 const factory = FactoryGirl.factory;
 const MongooseAdapter = new FactoryGirl.MongooseAdapter();
 factory.setAdapter(MongooseAdapter);
 factory.define("cake", Cake, {
   name: () => faker.commerce.productName(),
-  descritpion: () => faker.commerce.productDescription().slice(0, 100),
-  image: () => faker.imafe.url(),
+  description: () => faker.commerce.productDescription().slice(0, 100),
+  image: () => faker.image.avatar(),
   price: () => faker.commerce.price(),
   isAvailable: () => faker.datatype.boolean(),
 });
@@ -29,7 +29,7 @@ const seed_db = async () => {
     await Cake.deleteMany({}); // deletes all job records
     await User.deleteMany({}); // and all the users
     testUser = await factory.create("user", { password: testUserPassword });
-    await factory.createMany("job", 20, { createdBy: testUser._id }); // put 30 job entries in the database.
+    await factory.createMany("cake", 20, { createdBy: testUser._id }); // put 30 job entries in the database.
   } catch (e) {
     console.log("database error");
     console.log(e.message);
