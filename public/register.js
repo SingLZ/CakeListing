@@ -45,7 +45,18 @@ export const handleRegister = () => {
               }),
             });
 
-            const data = await response.json();
+            let data;
+            try {
+              const text = await response.text(); // read raw response
+              console.log("Raw server response:", text); // debug output
+              data = JSON.parse(text); // try parsing
+            } catch (err) {
+              console.error("Failed to parse JSON:", err);
+              message.textContent = "Server returned an unexpected response.";
+              enableInput(true);
+              return;
+            }
+
             if (response.status === 201) {
               message.textContent = `Registration successful.  Welcome ${data.user.name}`;
               setToken(data.token);

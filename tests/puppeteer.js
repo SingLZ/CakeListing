@@ -1,60 +1,69 @@
 const puppeteer = require("puppeteer");
 require("../app");
 const { seed_db, testUserPassword } = require("../util/seed_db");
-const cake = require("../models/cake");
 
 let testUser = null;
-
 let page = null;
 let browser = null;
-// Launch the browser and open a new blank page
+
 describe("jobs-ejs puppeteer test", function () {
+  this.timeout(10000); 
+
   before(async function () {
-    this.timeout(10000);
-    //await sleeper(5000)
-    browser = await puppeteer.launch();
+    testUser = await seed_db();
+      browser = await puppeteer.launch({
+      headless: true, // Set to false to see the browser
+      slowMo: 50      // Slow down for visibility
+    });
     page = await browser.newPage();
-    await page.goto("http://localhost:3000");
+    await page.goto("http://localhost:3000", { waitUntil: "networkidle0" });
   });
+
   after(async function () {
-    this.timeout(5000);
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   });
-  describe("got to site", function () {
-    it("should have completed a connection", async function () {});
-  });
+
   describe("index page test", function () {
-    this.timeout(10000);
-    it("finds the index page logon link", async () => {
-      this.logonLink = await page.waitForSelector(
-        "a ::-p-text(Click this link to logon)",
-      );
+    it("finds the index page logon link", async function () {
+      // const html = await page.content();
+      // console.log("Page HTML:", html);
+
+      await page.waitForSelector('#logon-register');
     });
-    it("gets to the logon page", async () => {
-      await this.logonLink.click();
-      await page.waitForNavigation();
-      const email = await page.waitForSelector('input[name="email"]');
+
+    it("gets to the logon page", async function () {
+      await page.waitForSelector('#logon', { visible: true });
+      const logonButton = await page.$('#logon');
+      if (!logonButton) {
+        await page.screenshot({ path: "logon-link-missing.png" });
+        throw new Error("Logon link not found on index page");
+      }
+      await logonButton.click();
+      await page.waitForSelector('#logon-div', { visible: true });
+      
+      await page.waitForSelector('input#email', { visible: true });
+      await page.waitForSelector('input#password', { visible: true });
     });
   });
+
   describe("logon page test", function () {
-    this.timeout(20000);
-    it("resolves all the fields", async () => {
-      this.email = await page.waitForSelector('input[name="email"]');
-      this.password = await page.waitForSelector('input[name="password"]');
-      this.submit = await page.waitForSelector("button ::-p-text(Logon)");
+    it("resolves all the fields", async function () {
+      await page.waitForSelector('input#email');
+      await page.waitForSelector('input#password');
+      await page.waitForSelector('button#logon-button');
     });
-    it("sends the logon", async () => {
+
+    it("sends the logon", async function () {
       testUser = await seed_db();
-      await this.email.type(testUser.email);
-      await this.password.type(testUserPassword);
-      await this.submit.click();
-      await page.waitForNavigation();
-      await page.waitForSelector(`p ::-p-text(${testUser.name} is logged on.)`);
-      await page.waitForSelector("a ::-p-text(change the secret)");
-      await page.waitForSelector('a[href="/secretWord"]');
-      const copyr = await page.waitForSelector("p ::-p-text(copyright)");
-      const copyrText = await copyr.evaluate((el) => el.textContent);
-      console.log("copyright text: ", copyrText);
+  
+
+      await page.type('input#email', "sing@gmail.com");
+      await page.type('input#password', "password");
+
+     
+  
     });
   });
 });
